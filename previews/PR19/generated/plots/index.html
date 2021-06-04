@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Simple Walkthrough · GraphMakie.jl</title><link rel="canonical" href="https://JuliaPlots.github.io/GraphMakie.jl/generated/plots/"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit">GraphMakie.jl</span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Examples</span><ul><li class="is-active"><a class="tocitem" href>Simple Walkthrough</a><ul class="internal"><li><a class="tocitem" href="#The-graphplot-Command"><span>The <code>graphplot</code> Command</span></a></li><li><a class="tocitem" href="#Adding-Node-Labels"><span>Adding Node Labels</span></a></li><li><a class="tocitem" href="#Adding-Edge-Labels"><span>Adding Edge Labels</span></a></li><li><a class="tocitem" href="#Indicate-Edge-Direction"><span>Indicate Edge Direction</span></a></li><li><a class="tocitem" href="#Plot-3D-Graphs"><span>Plot 3D Graphs</span></a></li></ul></li><li><a class="tocitem" href="../interactions/">Interaction Examples</a></li><li><a class="tocitem" href="../depgraph/">Dependency Graph</a></li><li><a class="tocitem" href="../truss/">Stress on Truss</a></li><li><a class="tocitem" href="../syntaxtree/">Julia AST</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href>Simple Walkthrough</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Simple Walkthrough</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/JuliaPlots/GraphMakie.jl/blob/master/docs/examples/plots.jl" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Plotting-Graphs-with-GraphMakie.jl"><a class="docs-heading-anchor" href="#Plotting-Graphs-with-GraphMakie.jl">Plotting Graphs with <code>GraphMakie.jl</code></a><a id="Plotting-Graphs-with-GraphMakie.jl-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting-Graphs-with-GraphMakie.jl" title="Permalink"></a></h1><h2 id="The-graphplot-Command"><a class="docs-heading-anchor" href="#The-graphplot-Command">The <code>graphplot</code> Command</a><a id="The-graphplot-Command-1"></a><a class="docs-heading-anchor-permalink" href="#The-graphplot-Command" title="Permalink"></a></h2><p>Plotting your first <code>AbstractGraph</code> from <a href="https://juliagraphs.org/LightGraphs.jl/latest/"><code>LightGraphs.jl</code></a> is as simple as</p><pre><code class="language-">using CairoMakie
+CairoMakie.activate!(type=&quot;png&quot;) # hide
+set_theme!(resolution=(800, 400)) #hide
+CairoMakie.inline!(true) # hide
+using GraphMakie
+using LightGraphs
+import Random; Random.seed!(2) # hide
+
+g = wheel_graph(10)
+f, ax, p = graphplot(g)
+hidedecorations!(ax); hidespines!(ax)
+ax.aspect = DataAspect()
+f # hide</code></pre><p>The <code>graphplot</code> command is a recipe which wraps several steps</p><ul><li>layout the graph in space using a layout function,</li><li>create a <code>scatter</code> plot for the nodes and</li><li>create a <code>linesegments</code> plot for the edges.</li></ul><p>The default layout is <code>Spring()</code> from <a href="https://github.com/JuliaGraphs/NetworkLayout.jl"><code>NetworkLayout.jl</code></a>. The layout attribute can be any function which takes an <code>AbstractGraph</code> and returns a list of <code>Point{dim,Ptype}</code> (see <a href="https://github.com/JuliaGeometry/GeometryBasics.jl"><code>GeometryBasics.jl</code></a> objects where <code>dim</code> determines the dimensionality of the plot.</p><p>Besides that there are some common attributes which are forwarded to the underlying plot commands. See <a href="../../#GraphMakie.graphplot"><code>graphplot</code></a>.</p><pre><code class="language-">using GraphMakie.NetworkLayout
+
+g = SimpleGraph(5)
+add_edge!(g, 1, 2); add_edge!(g, 2, 4);
+add_edge!(g, 4, 3); add_edge!(g, 3, 2);
+add_edge!(g, 2, 5); add_edge!(g, 5, 4);
+add_edge!(g, 4, 1); add_edge!(g, 1, 5);
+
+# define some edge colors
+edgecolors = [:black for i in 1:ne(g)]
+edgecolors[4] = edgecolors[7] = :red
+
+f, ax, p = graphplot(g, layout=Circular(),
+                     node_color=[:black, :red, :red, :red, :black],
+                     edge_color=edgecolors)
+
+hidedecorations!(ax); hidespines!(ax)
+ax.aspect = DataAspect()
+f #hide</code></pre><p>We can interactively change the attributes as usual with Makie.</p><pre><code class="language-">fixed_layout(_) = [(0,0), (0,1), (0.5, 1.5), (1,1), (1,0)]
+# set new layout
+p.layout = fixed_layout; autolimits!(ax)
+# change edge width &amp; color
+p.edge_width = 5.0
+p.edge_color[][3] = :green;
+p.edge_color = p.edge_color[] # trigger observable
+f #hide</code></pre><h2 id="Adding-Node-Labels"><a class="docs-heading-anchor" href="#Adding-Node-Labels">Adding Node Labels</a><a id="Adding-Node-Labels-1"></a><a class="docs-heading-anchor-permalink" href="#Adding-Node-Labels" title="Permalink"></a></h2><pre><code class="language-">Random.seed!(2)
+g = wheel_graph(10)
+
+colors = [:black for i in 1:nv(g)]
+colors[1] = :red
+
+f, ax, p = graphplot(g,
+                     nlabels=repr.(1:nv(g)),
+                     nlabels_color=colors,
+                     nlabels_align=(:center,:center))
+hidedecorations!(ax); hidespines!(ax); ax.aspect = DataAspect()
+f # hide</code></pre><p>This is not very nice, lets change the offsets based on the <code>node_positions</code></p><pre><code class="language-">offsets = 0.15 * (p[:node_positions][] .- p[:node_positions][][1])
+offsets[1] = Point2f0(0, 0.3)
+p.nlabels_offset[] = offsets
+autolimits!(ax)
+f # hide</code></pre><h2 id="Adding-Edge-Labels"><a class="docs-heading-anchor" href="#Adding-Edge-Labels">Adding Edge Labels</a><a id="Adding-Edge-Labels-1"></a><a class="docs-heading-anchor-permalink" href="#Adding-Edge-Labels" title="Permalink"></a></h2><pre><code class="language-">Random.seed!(42)
+g = barabasi_albert(6, 2)
+
+labels =  repr.(1:ne(g))
+
+f, ax, p = graphplot(g, elabels=labels,
+                     elabels_color=[:black for i in 1:ne(g)],
+                     edge_color=[:black for i in 1:ne(g)])
+hidedecorations!(ax); hidespines!(ax); ax.aspect = DataAspect()
+f # hide</code></pre><p>The position of the edge labels is determined by several plot arguments. All possible arguments are described in the docs of the <a href="../../#GraphMakie.graphplot"><code>graphplot</code></a> function.</p><p>Basicially, each label is placed in the middle of the edge and rotated to match the edge rotation. The rotaion for each label can be overwritten with the <code>elabels_rotation</code> argument.</p><pre><code class="language-">p.elabels_rotation[] = Vector{Union{Nothing, Float64}}(nothing, ne(g))
+p.elabels_rotation[][5] = 0.0 # set absolute rotation angle for label 5
+p.elabels_rotation[] = p.elabels_rotation[]
+nothing #hide</code></pre><p>One can shift the label along the edge with the <code>elabels_shift</code> argument and determine the distance in pixels using the <code>elabels_distance</code> argument.</p><pre><code class="language-">p.elabels_opposite[] = [1,2,8,6]
+
+p.elabels_offset[] = [Point2f0(0.0, 0.0) for i in 1:ne(g)]
+p.elabels_offset[][5] = Point2f0(-0.4,0)
+p.elabels_offset[] = p.elabels_offset[]
+
+p.elabels_shift[] = [0.5 for i in 1:ne(g)]
+p.elabels_shift[][1] = 0.6
+p.elabels_shift[][7] = 0.4
+p.elabels_shift[] = p.elabels_shift[]
+
+p.elabels_distance[] = zeros(ne(g))
+p.elabels_distance[][8] = -15 # minus because it is in opposite!
+p.elabels_distance[] = p.elabels_distance[]
+
+f # hide</code></pre><h2 id="Indicate-Edge-Direction"><a class="docs-heading-anchor" href="#Indicate-Edge-Direction">Indicate Edge Direction</a><a id="Indicate-Edge-Direction-1"></a><a class="docs-heading-anchor-permalink" href="#Indicate-Edge-Direction" title="Permalink"></a></h2><p>It is possible to put arrows on the edges using the <code>arrow_show</code> parameter. This parameter is <code>true</code> for <code>SimpleDiGraph</code> by default. The position and size of each arrowhead can be change using the <code>arrow_shift</code> and <code>arrow_size</code> parameters.</p><pre><code class="language-">g = wheel_digraph(10)
+arrow_size = [10+i for i in 1:ne(g)]
+arrow_shift = range(0.1, 0.8, length=ne(g))
+f, ax, p = graphplot(g; arrow_size, arrow_shift)
+hidedecorations!(ax); hidespines!(ax); ax.aspect = DataAspect()
+f # hide</code></pre><h2 id="Plot-3D-Graphs"><a class="docs-heading-anchor" href="#Plot-3D-Graphs">Plot 3D Graphs</a><a id="Plot-3D-Graphs-1"></a><a class="docs-heading-anchor-permalink" href="#Plot-3D-Graphs" title="Permalink"></a></h2><p>If the layout returns points in 3 dimensions, the plot will be in 3D. However this is a bit experimental. Feel free to file an issue if there are any problems.</p><pre><code class="language-">using JSServe
+Page(exportable=true, offline=true)
+using WGLMakie
+WGLMakie.activate!()
+
+g = smallgraph(:cubical)
+graphplot(g, layout=Spring(dim=3))</code></pre><hr/><p><em>This page was generated using <a href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Home</a><a class="docs-footer-nextpage" href="../interactions/">Interaction Examples »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Friday 4 June 2021 17:04">Friday 4 June 2021</span>. Using Julia version 1.6.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
